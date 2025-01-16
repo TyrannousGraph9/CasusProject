@@ -36,7 +36,7 @@ Volg de onderstaande stappen om deze repository lokaal op je computer te clonen 
 
 1. Maak een nieuwe branch door
 
-```git checkout branchnaam```
+```git checkout -b branchnaam```
 
 
 2. Voeg alle changes toe
