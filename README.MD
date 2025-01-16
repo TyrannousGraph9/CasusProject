@@ -32,4 +32,22 @@ Volg de onderstaande stappen om deze repository lokaal op je computer te clonen 
 
 ---
 
-Nu kun je verder werken aan het project of wijzigingen aanbrengen in de repository.
+### **Stap 3: Changes pushen**
+
+1. Maak een nieuwe branch door
+
+```git checkout branchnaam```
+
+
+2. Voeg alle changes toe
+
+```git add .```
+
+3. Push de changes
+
+```git commit -m "Beschrijving van de wijziging"```
+
+
+4. Commit naar branch
+
+```git push origin branchnaam```
