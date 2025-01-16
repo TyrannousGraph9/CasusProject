@@ -9,11 +9,15 @@ public class TakePicture : MonoBehaviour
 {
     public RawImage image;
 
-    public TextMeshProUGUI locationText, locationText2;
 
-
-    void Start()
+    void OnEnable()
     {
+        CapturePicture(2400);
+    }
+
+    public void CapturePicture(int maxSize)
+    {
+
         if (!PlayerPrefs.HasKey("ImageId"))
         {
             PlayerPrefs.SetInt("ImageId", 1);
@@ -24,10 +28,8 @@ public class TakePicture : MonoBehaviour
             PlayerPrefs.SetInt("ImageId", imageId + 1);
             PlayerPrefs.Save();
         }
-    }
 
-    public void CapturePicture(int maxSize)
-    {
+
         if (NativeCamera.CheckPermission(true) != NativeCamera.Permission.Granted)
         {
             NativeCamera.RequestPermission(true);
@@ -41,7 +43,6 @@ public class TakePicture : MonoBehaviour
 
         NativeCamera.Permission permission = NativeCamera.TakePicture((path) =>
         {
-            locationText.text = "Image path: " + path;
 
             if (path != null)
             {
@@ -69,6 +70,7 @@ public class TakePicture : MonoBehaviour
 
     private void SaveTextureToFile(Texture2D texture, string fileName)
     {
+
         byte[] bytes = texture.EncodeToPNG();
         string directoryPath = Path.Combine("/storage/emulated/0/DCIM/Camera");
         if (!Directory.Exists(directoryPath))
@@ -78,7 +80,6 @@ public class TakePicture : MonoBehaviour
         string filePath = Path.Combine(directoryPath, fileName);
         File.WriteAllBytes(filePath, bytes);
         Debug.Log("Image saved to: " + filePath);
-        locationText2.text = "Image saved to: " + filePath;
 
         // Save the path in PlayerPrefs
         PlayerPrefs.SetString("SavedImagePath", filePath);
