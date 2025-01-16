@@ -58,3 +58,5 @@ Packages/com.unity.package-manager-ui/
 *.swp
 *.iddb
 *.pidb.meta
+
+/.utmp/*
