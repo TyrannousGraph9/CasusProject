@@ -2,9 +2,15 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using NativeCameraNamespace;
+using UnityEngine.Android;
+using TMPro;
 public class TakePicture : MonoBehaviour
 {
     public RawImage image;
+
+    public TextMeshProUGUI locationText, locationText2;
+
+
 
     public void CapturePicture(int maxSize)
     {
@@ -12,10 +18,16 @@ public class TakePicture : MonoBehaviour
         {
             NativeCamera.RequestPermission(true);
         }
+        Permission.RequestUserPermission(Permission.Camera);
+        Permission.RequestUserPermission(Permission.ExternalStorageWrite);
+        Permission.RequestUserPermission(Permission.ExternalStorageRead);
+
+
+
 
         NativeCamera.Permission permission = NativeCamera.TakePicture((path) =>
         {
-            Debug.Log("Image path: " + path);
+            locationText.text = "Image path: " + path;
             if (path != null)
             {
                 // Create a Texture2D from the captured image
@@ -43,7 +55,7 @@ public class TakePicture : MonoBehaviour
         byte[] bytes = texture.EncodeToPNG();
         string filePath = Path.Combine(Application.persistentDataPath, fileName);
         File.WriteAllBytes(filePath, bytes);
-        Debug.Log("Image saved to: " + filePath);
+        locationText2.text = "Image saved to: " + filePath;
 
         
         #if UNITY_ANDROID
