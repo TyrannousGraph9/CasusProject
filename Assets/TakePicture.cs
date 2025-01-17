@@ -50,7 +50,7 @@ public class TakePicture : MonoBehaviour
                 Texture2D texture = NativeCamera.LoadImageAtPath(path, maxSize, false);
                 if (texture == null)
                 {
-                    Debug.Log("Couldn't load texture from " + path);
+
                     return;
                 }
 
@@ -65,7 +65,6 @@ public class TakePicture : MonoBehaviour
             }
         }, maxSize);
 
-        Debug.Log("Permission result: " + permission);
     }
 
     private void SaveTextureToFile(Texture2D texture, string fileName)
@@ -79,7 +78,6 @@ public class TakePicture : MonoBehaviour
         }
         string filePath = Path.Combine(directoryPath, fileName);
         File.WriteAllBytes(filePath, bytes);
-        Debug.Log("Image saved to: " + filePath);
 
         // Save the path in PlayerPrefs
         PlayerPrefs.SetString("SavedImagePath", filePath);
