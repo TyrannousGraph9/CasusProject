@@ -119,6 +119,50 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &283086815
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 283086817}
+  - component: {fileID: 283086816}
+  m_Layer: 0
+  m_Name: API
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &283086816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 283086815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 174860041153693479681801e52ca7d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &283086817
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 283086815}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 215.5999, y: 360.8023, z: 2.5146904}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &832968103
 GameObject:
   m_ObjectHideFlags: 0
@@ -129,7 +173,7 @@ GameObject:
   m_Component:
   - component: {fileID: 832968104}
   m_Layer: 0
-  m_Name: SchernHouder
+  m_Name: SchermHouder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -299,6 +343,7 @@ GameObject:
   - component: {fileID: 1131542445}
   - component: {fileID: 1131542444}
   - component: {fileID: 1131542443}
+  - component: {fileID: 1131542446}
   m_Layer: 5
   m_Name: Login_scherm
   m_TagString: Untagged
@@ -394,6 +439,20 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &1131542446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1131542441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ec504973bef14d4f9b6dfb957c59f23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gebruikerField: {fileID: 1569332520}
+  wachtwoordField: {fileID: 1773870922}
 --- !u!1 &1197119561
 GameObject:
   m_ObjectHideFlags: 0
@@ -2257,3 +2316,4 @@ SceneRoots:
   m_Roots:
   - {fileID: 1537248225}
   - {fileID: 832968104}
+  - {fileID: 283086817}
