@@ -25,81 +25,49 @@ public class APIClass : MonoBehaviour
         // string jsonData = InsertIntoDatabase("InheemseSoort", inheemseSoortValues);
         // StartCoroutine(ConnectToApi(jsonData));
         
-
-        // Voorbeeld 2: Data toevoegen aan de 'Fotos'-tabel
-        
-        string gebruikerId = "1";
-
-        Dictionary<string, string> fotosValues = new Dictionary<string, string>
-        {
-            { "FotoURL", "https://example.com/images/golden_eagle.jpg" },
-            { "Beschrijving", "A stunning image of a Golden Eagle." },
-            { "Status", "In Beoordeling" }, // Default status
-            { "GebruikerID", gebruikerId }, // Use a valid GebruikerID
-            { "UploadDatum", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") } // Current date and time
-        };
-
-        string jsonData = InsertIntoDatabase("Fotos", fotosValues);
-        StartCoroutine(ConnectToApi(jsonData, (response) => {
-            Debug.Log("API Response: " + response);
-        }));
-        
     }
 
     // Methode om een SQL INSERT-query te bouwen en om te zetten naar JSON
-   public string InsertIntoDatabase(string databaseTable, Dictionary<string, string> values)
-{
-    string query = null; // Hier wordt de SQL-query opgeslagen
-    string jsonData = null; // Hier wordt de query als JSON opgeslagen
-
-    // Controleren of de invoer geldig is
-    if (string.IsNullOrEmpty(databaseTable) || values == null || values.Count == 0)
+    public string InsertIntoDatabase(string databaseTable, Dictionary<string, string> values)
     {
-        throw new ArgumentException("De tabelnaam en waarden moeten worden opgegeven.");
-    }
+        string query = null; // Hier wordt de SQL-query opgeslagen
+        string jsonData = null; // Hier wordt de query als JSON opgeslagen
 
-    if (databaseTable == "Fotos")
-    {
-        // Controleer of alle verplichte velden voor 'Fotos' aanwezig zijn
-        if (!values.ContainsKey("FotoURL") || !values.ContainsKey("Beschrijving") ||
-            !values.ContainsKey("Status") || !values.ContainsKey("GebruikerID"))
+        // Controleren of de invoer geldig is
+        if (string.IsNullOrEmpty(databaseTable) || values == null || values.Count == 0)
         {
-            throw new ArgumentException("FotoURL, Beschrijving, Status en GebruikerID zijn verplicht voor de Fotos-tabel.");
+            throw new ArgumentException("De tabelnaam en waarden moeten worden opgegeven.");
         }
 
-        // Bouw de SQL-query
-        string columns = string.Join(", ", values.Keys); // Kolomnamen combineren
-        string valuesList = string.Join(", ", values.Values.Select(value => $"'{value}'")); // Waarden combineren met quotes
-        query = $"INSERT INTO Fotos ({columns}) VALUES ({valuesList})";
-    }
-    else if (databaseTable == "InheemseSoort")
-    {
-        // Controleer of alle verplichte velden voor 'InheemseSoort' aanwezig zijn
-        if (!values.ContainsKey("Naam") || !values.ContainsKey("LocatieNaam") ||
-            !values.ContainsKey("Longitude") || !values.ContainsKey("Latitude") ||
-            !values.ContainsKey("UploadDatum"))
+        
+        if (databaseTable == "InheemseSoort")
         {
-            throw new ArgumentException("Naam, LocatieNaam, Longitude, Latitude en UploadDatum zijn verplicht voor de InheemseSoort-tabel.");
+            // Controleer of alle verplichte velden voor 'InheemseSoort' aanwezig zijn
+            if (!values.ContainsKey("Naam") || !values.ContainsKey("LocatieNaam") ||
+                !values.ContainsKey("Longitude") || !values.ContainsKey("Latitude") ||
+                !values.ContainsKey("UploadDatum"))
+            {
+                throw new ArgumentException("Naam, LocatieNaam, Longitude, Latitude en Datum zijn verplicht voor de InheemseSoort-tabel.");
+            }
+
+            // Bouw de SQL-query
+            string columns = string.Join(", ", values.Keys); // Kolomnamen combineren
+            string valuesList = string.Join(", ", values.Values.Select(value => $"'{value}'")); // Waarden combineren met quotes
+            query = $"INSERT INTO InheemseSoort ({columns}) VALUES ({valuesList})";
+        }
+        else
+        {
+            throw new ArgumentException("Ongeldige tabelnaam.");
         }
 
-        // Bouw de SQL-query
-        string columns = string.Join(", ", values.Keys); // Kolomnamen combineren
-        string valuesList = string.Join(", ", values.Values.Select(value => $"'{value}'")); // Waarden combineren met quotes
-        query = $"INSERT INTO InheemseSoort ({columns}) VALUES ({valuesList})";
-    }
-    else
-    {
-        throw new ArgumentException("Ongeldige tabelnaam.");
-    }
+        // Zet de query om in JSON-formaat
+        if (!string.IsNullOrEmpty(query))
+        {
+            jsonData = JsonUtility.ToJson(new QueryData { query = query });
+        }
 
-    // Zet de query om in JSON-formaat
-    if (!string.IsNullOrEmpty(query))
-    {
-        jsonData = JsonUtility.ToJson(new QueryData { query = query });
+        return jsonData;
     }
-
-    return jsonData;
-}
 
     // Methode om een SQL SELECT-query te bouwen en om te zetten naar JSON
     public string SelectFromDatabase(string databaseTable, string columnToSearch = "*", string searchValue = null)
@@ -116,13 +84,13 @@ public class APIClass : MonoBehaviour
         // Bouw de SQL-query op basis van de invoer
         if (!string.IsNullOrEmpty(searchValue) && columnToSearch != "*")
         {
-            query = $"SELECT {columnToSearch} FROM {databaseTable} WHERE {columnToSearch} = '{searchValue}'";
+            query = $"SELECT {columnToSearch} FROM {databaseTable} WHERE {columnToSearch} = '{searchValue}' AND Status = 'Goedgekeurd'";
         }
         else if (columnToSearch != "*")
         {
-            query = $"SELECT {columnToSearch} FROM {databaseTable}";
+            query = $"SELECT {columnToSearch} FROM {databaseTable} WHERE Status = 'Goedgekeurd'";
         }
-        else if (string.IsNullOrEmpty(searchValue))
+        else
         {
             query = $"SELECT * FROM {databaseTable} WHERE Status = 'Goedgekeurd'";
         }
@@ -178,20 +146,20 @@ public class APIClass : MonoBehaviour
 
     private List<DataItem> FilterResponse(string response)
     {
-    response = response.Replace("\n", "");
+        response = response.Replace("\n", "");
 
-    ApiResponse apiResponse = JsonUtility.FromJson<ApiResponse>(response);
+        ApiResponse apiResponse = JsonUtility.FromJson<ApiResponse>(response);
 
-    if (apiResponse.success)
-    {
-        return apiResponse.data;
+        if (apiResponse.success)
+        {
+            return apiResponse.data;
+        }
+        else
+        {
+            Debug.LogError("API response indicates failure.");
+            return null;
+        }
     }
-    else
-    {
-        Debug.LogError("API response indicates failure.");
-        return null;
-    }
-}
 }
 
 // Klasse om de querydata op te slaan voor JSON-serialisatie
