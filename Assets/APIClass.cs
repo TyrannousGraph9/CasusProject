@@ -48,58 +48,58 @@ public class APIClass : MonoBehaviour
 
     // Methode om een SQL INSERT-query te bouwen en om te zetten naar JSON
    public string InsertIntoDatabase(string databaseTable, Dictionary<string, string> values)
+{
+    string query = null; // Hier wordt de SQL-query opgeslagen
+    string jsonData = null; // Hier wordt de query als JSON opgeslagen
+
+    // Controleren of de invoer geldig is
+    if (string.IsNullOrEmpty(databaseTable) || values == null || values.Count == 0)
     {
-        string query = null; // Hier wordt de SQL-query opgeslagen
-        string jsonData = null; // Hier wordt de query als JSON opgeslagen
-
-        // Controleren of de invoer geldig is
-        if (string.IsNullOrEmpty(databaseTable) || values == null || values.Count == 0)
-        {
-            throw new ArgumentException("De tabelnaam en waarden moeten worden opgegeven.");
-        }
-
-        if (databaseTable == "Fotos")
-        {
-            // Controleer of alle verplichte velden voor 'Fotos' aanwezig zijn
-            if (!values.ContainsKey("Foto") || !values.ContainsKey("Beschrijving") ||
-                !values.ContainsKey("Status") || !values.ContainsKey("GebruikerID"))
-            {
-                throw new ArgumentException("FotoURL, Beschrijving, Status en GebruikerID zijn verplicht voor de Fotos-tabel.");
-            }
-
-            // Bouw de SQL-query
-            string columns = string.Join(", ", values.Keys); // Kolomnamen combineren
-            string valuesList = string.Join(", ", values.Values.Select(value => $"'{value}'")); // Waarden combineren met quotes
-            query = $"INSERT INTO Fotos ({columns}) VALUES ({valuesList})";
-        }
-        else if (databaseTable == "InheemseSoort")
-        {
-            // Controleer of alle verplichte velden voor 'InheemseSoort' aanwezig zijn
-            if (!values.ContainsKey("Naam") || !values.ContainsKey("LocatieNaam") ||
-                !values.ContainsKey("Longitude") || !values.ContainsKey("Latitude") ||
-                !values.ContainsKey("UploadDatum"))
-            {
-                throw new ArgumentException("Naam, LocatieNaam, Longitude, Latitude en Datum zijn verplicht voor de InheemseSoort-tabel.");
-            }
-
-            // Bouw de SQL-query
-            string columns = string.Join(", ", values.Keys); // Kolomnamen combineren
-            string valuesList = string.Join(", ", values.Values.Select(value => $"'{value}'")); // Waarden combineren met quotes
-            query = $"INSERT INTO InheemseSoort ({columns}) VALUES ({valuesList})";
-        }
-        else
-        {
-            throw new ArgumentException("Ongeldige tabelnaam.");
-        }
-
-        // Zet de query om in JSON-formaat
-        if (!string.IsNullOrEmpty(query))
-        {
-            jsonData = JsonUtility.ToJson(new QueryData { query = query });
-        }
-
-        return jsonData;
+        throw new ArgumentException("De tabelnaam en waarden moeten worden opgegeven.");
     }
+
+    if (databaseTable == "Fotos")
+    {
+        // Controleer of alle verplichte velden voor 'Fotos' aanwezig zijn
+        if (!values.ContainsKey("FotoURL") || !values.ContainsKey("Beschrijving") ||
+            !values.ContainsKey("Status") || !values.ContainsKey("GebruikerID"))
+        {
+            throw new ArgumentException("FotoURL, Beschrijving, Status en GebruikerID zijn verplicht voor de Fotos-tabel.");
+        }
+
+        // Bouw de SQL-query
+        string columns = string.Join(", ", values.Keys); // Kolomnamen combineren
+        string valuesList = string.Join(", ", values.Values.Select(value => $"'{value}'")); // Waarden combineren met quotes
+        query = $"INSERT INTO Fotos ({columns}) VALUES ({valuesList})";
+    }
+    else if (databaseTable == "InheemseSoort")
+    {
+        // Controleer of alle verplichte velden voor 'InheemseSoort' aanwezig zijn
+        if (!values.ContainsKey("Naam") || !values.ContainsKey("LocatieNaam") ||
+            !values.ContainsKey("Longitude") || !values.ContainsKey("Latitude") ||
+            !values.ContainsKey("UploadDatum"))
+        {
+            throw new ArgumentException("Naam, LocatieNaam, Longitude, Latitude en UploadDatum zijn verplicht voor de InheemseSoort-tabel.");
+        }
+
+        // Bouw de SQL-query
+        string columns = string.Join(", ", values.Keys); // Kolomnamen combineren
+        string valuesList = string.Join(", ", values.Values.Select(value => $"'{value}'")); // Waarden combineren met quotes
+        query = $"INSERT INTO InheemseSoort ({columns}) VALUES ({valuesList})";
+    }
+    else
+    {
+        throw new ArgumentException("Ongeldige tabelnaam.");
+    }
+
+    // Zet de query om in JSON-formaat
+    if (!string.IsNullOrEmpty(query))
+    {
+        jsonData = JsonUtility.ToJson(new QueryData { query = query });
+    }
+
+    return jsonData;
+}
 
     // Methode om een SQL SELECT-query te bouwen en om te zetten naar JSON
     public string SelectFromDatabase(string databaseTable, string columnToSearch = "*", string searchValue = null)
@@ -116,15 +116,15 @@ public class APIClass : MonoBehaviour
         // Bouw de SQL-query op basis van de invoer
         if (!string.IsNullOrEmpty(searchValue) && columnToSearch != "*")
         {
-            query = $"SELECT {columnToSearch}, FotoURL FROM {databaseTable} JOIN Fotos ON {databaseTable}.ID = Fotos.ID WHERE {columnToSearch} = '{searchValue}'";
+            query = $"SELECT {columnToSearch} FROM {databaseTable} WHERE {columnToSearch} = '{searchValue}'";
         }
         else if (columnToSearch != "*")
         {
-            query = $"SELECT {columnToSearch}, FotoURL FROM {databaseTable} JOIN Fotos ON {databaseTable}.ID = Fotos.ID";
+            query = $"SELECT {columnToSearch} FROM {databaseTable}";
         }
         else if (string.IsNullOrEmpty(searchValue))
         {
-            query = $"SELECT *, FotoURL FROM {databaseTable} JOIN Fotos ON {databaseTable}.ID = Fotos.ID WHERE Status = 'Goedgekeurd'";
+            query = $"SELECT * FROM {databaseTable} WHERE Status = 'Goedgekeurd'";
         }
 
         // Zet de query om in JSON-formaat
@@ -212,7 +212,7 @@ public class ApiResponse
 [System.Serializable]
 public class DataItem
 {   
-    public Texture2D Foto;
+    public string Foto;
     public string Naam;
     public string LocatieNaam;
     public string Longitude;

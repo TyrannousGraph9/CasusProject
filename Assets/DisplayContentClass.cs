@@ -29,7 +29,11 @@ public class DisplayContentClass : MonoBehaviour
 
                     if (image != null)
                     {
-                        // image.texture = item.FotoURL;
+                        // convert from binary to texture  
+                        byte[] imageBytes = Convert.FromBase64String(item.Foto);
+                        Texture2D texture = new Texture2D(2, 2);
+                        texture.LoadImage(imageBytes);
+                        image.texture = texture;
                     }
                 }
 
@@ -73,6 +77,5 @@ public class DisplayContentClass : MonoBehaviour
             callback(response);
         }));
     }
-
     
 }

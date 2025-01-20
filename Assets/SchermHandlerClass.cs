@@ -100,9 +100,7 @@ public class SchermHandlerClass : MonoBehaviour
 
     public void Opslaan(Dictionary<string, string> combinedValues)
     {
-        Debug.Log(combinedValues);
         APIClass aPIClass = new APIClass();
-
         string jsonData = aPIClass.InsertIntoDatabase("InheemseSoort", combinedValues);
         StartCoroutine(aPIClass.ConnectToApi(jsonData, (response) => {
             Debug.Log("API Response: " + response);
