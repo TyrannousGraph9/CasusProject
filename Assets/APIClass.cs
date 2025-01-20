@@ -14,32 +14,37 @@ public class APIClass : MonoBehaviour
     {
         // Voorbeeld 1: Data toevoegen aan de 'InheemseSoort'-tabel
         
-        Dictionary<string, string> inheemseSoortValues = new Dictionary<string, string>
-        {
-            { "Naam", "Hond" },
-            { "LocatieNaam", "Parkstad" },
-            { "Longitude", "5.6929" },
-            { "Latitude", "52.4740" },
-            { "Datum", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") } // Huidige datum en tijd
-        };
+        // Dictionary<string, string> inheemseSoortValues = new Dictionary<string, string>
+        // {
+        //     { "Naam", "Hond" },
+        //     { "LocatieNaam", "Parkstad" },
+        //     { "Longitude", "5.6929" },
+        //     { "Latitude", "52.4740" },
+        //     { "Datum", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") } // Huidige datum en tijd
+        // };
 
-        string jsonData = InsertIntoDatabase("InheemseSoort", inheemseSoortValues);
-        StartCoroutine(ConnectToApi(jsonData));
+        // string jsonData = InsertIntoDatabase("InheemseSoort", inheemseSoortValues);
+        // StartCoroutine(ConnectToApi(jsonData));
         
 
         // Voorbeeld 2: Data toevoegen aan de 'Fotos'-tabel
-        /*
+        
+        string gebruikerId = "1";
+
         Dictionary<string, string> fotosValues = new Dictionary<string, string>
         {
             { "FotoURL", "https://example.com/images/golden_eagle.jpg" },
-            { "Beschrijving", "Een prachtige foto van een Golden Eagle." },
-            { "Status", "In Beoordeling" }, // Standaardstatus
-            { "UploadDatum", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") } // Huidige datum en tijd
+            { "Beschrijving", "A stunning image of a Golden Eagle." },
+            { "Status", "In Beoordeling" }, // Default status
+            { "GebruikerID", gebruikerId }, // Use a valid GebruikerID
+            { "UploadDatum", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") } // Current date and time
         };
 
         string jsonData = InsertIntoDatabase("Fotos", fotosValues);
-        StartCoroutine(ConnectToApi(jsonData));
-        */
+        StartCoroutine(ConnectToApi(jsonData, (response) => {
+            Debug.Log("API Response: " + response);
+        }));
+        
     }
 
     // Methode om een SQL INSERT-query te bouwen en om te zetten naar JSON
@@ -58,13 +63,13 @@ public class APIClass : MonoBehaviour
         {
             // Controleer of alle verplichte velden voor 'Fotos' aanwezig zijn
             if (!values.ContainsKey("FotoURL") || !values.ContainsKey("Beschrijving") ||
-                !values.ContainsKey("Status")) // Optioneel: controleer ook op 'GebruikerID'
+                !values.ContainsKey("Status") || !values.ContainsKey("GebruikerID"))// Optioneel: controleer ook op 'GebruikerID'
             {
                 throw new ArgumentException("FotoURL, Beschrijving, Status en GebruikerID zijn verplicht voor de Fotos-tabel.");
             }
 
             // Bouw de SQL-query
-            if (values.Count == 4)
+            if (values.Count == 5)
             {
                 string columns = string.Join(", ", values.Keys); // Kolomnamen combineren
                 string valuesList = string.Join(", ", values.Values.Select(value => $"'{value}'")); // Waarden combineren met quotes
@@ -146,8 +151,18 @@ public class APIClass : MonoBehaviour
         return jsonData;
     }
 
+    public string DatabaseLoginHandler(string gebruikersnaam, string wachtwoord)
+    {
+        string jsonData = JsonUtility.ToJson(new QueryData { query = "SELECT Role FROM Gebruiker WHERE Gebruikersnaam = " + gebruikersnaam +" AND Wachtwoord = " + wachtwoord +"" });
+        // change password dat we joinen vanuit een andere table
+        StartCoroutine(ConnectToApi(jsonData, (response) => {
+        Debug.Log("API Response: " + response);}));
+
+        return jsonData;        
+    }
+
     // Coroutine om de SQL-query naar de API te sturen
-    private IEnumerator ConnectToApi(string jsonData)
+    public IEnumerator ConnectToApi(string jsonData, Action<List<DataItem>> callback)
     {
         // Instellen van de UnityWebRequest voor een POST-aanvraag
         UnityWebRequest request = new UnityWebRequest(connectionString, "POST");
@@ -166,12 +181,32 @@ public class APIClass : MonoBehaviour
             Debug.LogError("Fout: " + request.error);
             Debug.LogError("Reactiecode: " + request.responseCode);
             Debug.LogError("Reactie: " + request.downloadHandler.text);
+            callback(null);
         }
         else
         {
             Debug.Log("Reactie: " + request.downloadHandler.text);
+            List<DataItem> filteredData = FilterResponse(request.downloadHandler.text);
+            callback(filteredData);
         }
     }
+
+    private List<DataItem> FilterResponse(string response)
+    {
+    response = response.Replace("\n", "");
+
+    ApiResponse apiResponse = JsonUtility.FromJson<ApiResponse>(response);
+
+    if (apiResponse.success)
+    {
+        return apiResponse.data;
+    }
+    else
+    {
+        Debug.LogError("API response indicates failure.");
+        return null;
+    }
+}
 }
 
 // Klasse om de querydata op te slaan voor JSON-serialisatie
@@ -179,4 +214,22 @@ public class APIClass : MonoBehaviour
 public class QueryData
 {
     public string query;
+}
+
+// serialize data zodat we precieser kunnen inzien en bekijken wat we terugkrijgen
+[System.Serializable]
+public class ApiResponse
+{
+    public bool success;
+    public List<DataItem> data;
+}
+
+[System.Serializable]
+public class DataItem
+{
+    public string Naam;
+    public string LocatieNaam;
+    public string Longitude;
+    public string Latitude;
+    public string Datum;
 }
