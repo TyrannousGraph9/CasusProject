@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
-
 public class APIClass : MonoBehaviour
 {
     // De API-endpoint voor de databaseverbinding
@@ -48,7 +47,7 @@ public class APIClass : MonoBehaviour
     }
 
     // Methode om een SQL INSERT-query te bouwen en om te zetten naar JSON
-    public string InsertIntoDatabase(string databaseTable, Dictionary<string, string> values)
+   public string InsertIntoDatabase(string databaseTable, Dictionary<string, string> values)
     {
         string query = null; // Hier wordt de SQL-query opgeslagen
         string jsonData = null; // Hier wordt de query als JSON opgeslagen
@@ -62,45 +61,31 @@ public class APIClass : MonoBehaviour
         if (databaseTable == "Fotos")
         {
             // Controleer of alle verplichte velden voor 'Fotos' aanwezig zijn
-            if (!values.ContainsKey("FotoURL") || !values.ContainsKey("Beschrijving") ||
-                !values.ContainsKey("Status") || !values.ContainsKey("GebruikerID"))// Optioneel: controleer ook op 'GebruikerID'
+            if (!values.ContainsKey("Foto") || !values.ContainsKey("Beschrijving") ||
+                !values.ContainsKey("Status") || !values.ContainsKey("GebruikerID"))
             {
                 throw new ArgumentException("FotoURL, Beschrijving, Status en GebruikerID zijn verplicht voor de Fotos-tabel.");
             }
 
             // Bouw de SQL-query
-            if (values.Count == 5)
-            {
-                string columns = string.Join(", ", values.Keys); // Kolomnamen combineren
-                string valuesList = string.Join(", ", values.Values.Select(value => $"'{value}'")); // Waarden combineren met quotes
-                query = $"INSERT INTO Fotos ({columns}) VALUES ({valuesList})";
-            }
-            else
-            {
-                throw new ArgumentException("Ongeldig aantal waarden voor de Fotos-tabel.");
-            }
+            string columns = string.Join(", ", values.Keys); // Kolomnamen combineren
+            string valuesList = string.Join(", ", values.Values.Select(value => $"'{value}'")); // Waarden combineren met quotes
+            query = $"INSERT INTO Fotos ({columns}) VALUES ({valuesList})";
         }
         else if (databaseTable == "InheemseSoort")
         {
             // Controleer of alle verplichte velden voor 'InheemseSoort' aanwezig zijn
             if (!values.ContainsKey("Naam") || !values.ContainsKey("LocatieNaam") ||
                 !values.ContainsKey("Longitude") || !values.ContainsKey("Latitude") ||
-                !values.ContainsKey("Datum"))
+                !values.ContainsKey("UploadDatum"))
             {
                 throw new ArgumentException("Naam, LocatieNaam, Longitude, Latitude en Datum zijn verplicht voor de InheemseSoort-tabel.");
             }
 
             // Bouw de SQL-query
-            if (values.Count == 5)
-            {
-                string columns = string.Join(", ", values.Keys); // Kolomnamen combineren
-                string valuesList = string.Join(", ", values.Values.Select(value => $"'{value}'")); // Waarden combineren met quotes
-                query = $"INSERT INTO InheemseSoort ({columns}) VALUES ({valuesList})";
-            }
-            else
-            {
-                throw new ArgumentException("Ongeldig aantal waarden voor de InheemseSoort-tabel.");
-            }
+            string columns = string.Join(", ", values.Keys); // Kolomnamen combineren
+            string valuesList = string.Join(", ", values.Values.Select(value => $"'{value}'")); // Waarden combineren met quotes
+            query = $"INSERT INTO InheemseSoort ({columns}) VALUES ({valuesList})";
         }
         else
         {
@@ -131,15 +116,15 @@ public class APIClass : MonoBehaviour
         // Bouw de SQL-query op basis van de invoer
         if (!string.IsNullOrEmpty(searchValue) && columnToSearch != "*")
         {
-            query = $"SELECT {columnToSearch} FROM {databaseTable} WHERE {columnToSearch} = '{searchValue}'";
+            query = $"SELECT {columnToSearch}, FotoURL FROM {databaseTable} JOIN Fotos ON {databaseTable}.ID = Fotos.ID WHERE {columnToSearch} = '{searchValue}'";
         }
         else if (columnToSearch != "*")
         {
-            query = $"SELECT {columnToSearch} FROM {databaseTable}";
+            query = $"SELECT {columnToSearch}, FotoURL FROM {databaseTable} JOIN Fotos ON {databaseTable}.ID = Fotos.ID";
         }
         else if (string.IsNullOrEmpty(searchValue))
         {
-            query = $"SELECT * FROM {databaseTable}";
+            query = $"SELECT *, FotoURL FROM {databaseTable} JOIN Fotos ON {databaseTable}.ID = Fotos.ID WHERE Status = 'Goedgekeurd'";
         }
 
         // Zet de query om in JSON-formaat
@@ -226,7 +211,8 @@ public class ApiResponse
 
 [System.Serializable]
 public class DataItem
-{
+{   
+    public Texture2D Foto;
     public string Naam;
     public string LocatieNaam;
     public string Longitude;

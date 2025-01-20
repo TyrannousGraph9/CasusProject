@@ -20,8 +20,18 @@ public class DisplayContentClass : MonoBehaviour
                 
                 scherm.transform.SetParent(transform, false);
 
-               
+                Transform imageTransform = scherm.transform.Find("RawImage");
                 Transform textTransform = scherm.transform.Find("Text (TMP)");
+
+                if(imageTransform != null)
+                {
+                    RawImage image = imageTransform.GetComponent<RawImage>();
+
+                    if (image != null)
+                    {
+                        // image.texture = item.FotoURL;
+                    }
+                }
 
                 if (textTransform != null)
                 {
@@ -46,12 +56,6 @@ public class DisplayContentClass : MonoBehaviour
         }
     });
 }
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void GetAllFromDB(Action<List<DataItem>> callback)
     {
         APIClass aPIClass = new APIClass();
@@ -60,4 +64,15 @@ public class DisplayContentClass : MonoBehaviour
             callback(response);
         }));
     }
+
+    public void SearchSpecificFromDB(string searchValue, Action<List<DataItem>> callback)
+    {
+        APIClass aPIClass = new APIClass();
+        string jsonData = aPIClass.SelectFromDatabase("InheemseSoort", searchValue);
+        StartCoroutine(aPIClass.ConnectToApi(jsonData, (response) => {
+            callback(response);
+        }));
+    }
+
+    
 }
