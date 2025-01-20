@@ -136,15 +136,15 @@ public class APIClass : MonoBehaviour
         return jsonData;
     }
 
-    public string DatabaseLoginHandler(string gebruikersnaam, string wachtwoord)
-    {
-        string jsonData = JsonUtility.ToJson(new QueryData { query = "SELECT Role FROM Gebruiker WHERE Gebruikersnaam = " + gebruikersnaam +" AND Wachtwoord = " + wachtwoord +"" });
+//    public string DatabaseLoginHandler(string gebruikersnaam, string wachtwoord)
+//   {
+//        string jsonData = JsonUtility.ToJson(new QueryData { query = "SELECT Role FROM Gebruiker WHERE Gebruikersnaam = " + gebruikersnaam +" AND Wachtwoord = " + wachtwoord +"" });
         // change password dat we joinen vanuit een andere table
-        StartCoroutine(ConnectToApi(jsonData, (response) => {
-        Debug.Log("API Response: " + response);}));
+//        StartCoroutine(ConnectToApi(jsonData, (response) => {
+//        Debug.Log("API Response: " + response);}));
 
-        return jsonData;        
-    }
+//        return jsonData;        
+//    }
 
     // Coroutine om de SQL-query naar de API te sturen
     public IEnumerator ConnectToApi(string jsonData, Action<List<DataItem>> callback)
