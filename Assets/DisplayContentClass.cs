@@ -8,15 +8,17 @@ public class DisplayContentClass : MonoBehaviour
 {
     public GameObject schermContainer;
 
+    public TMP_InputField searchInput;
+
     void OnEnable()
     {
-        // Display all items from the database when the object is enabled
+        
         DisplayAllItems();
     }
 
     void OnDisable()
     {
-        // Clear all children when the object is disabled
+
         foreach (Transform child in transform)
         {
             Destroy(child.gameObject);
@@ -53,8 +55,19 @@ public class DisplayContentClass : MonoBehaviour
         });
     }
 
+    public void Search()
+    {
+        DisplaySpecificItems(searchInput.text);
+    }
+
     private void DisplayItems(List<DataItem> items)
     {
+        
+        foreach (Transform child in transform)
+        {
+            Destroy(child.gameObject);
+        }
+
         foreach (var item in items)
         {
             GameObject scherm = Instantiate(schermContainer);
@@ -150,7 +163,7 @@ public class DisplayContentClass : MonoBehaviour
     public void SearchSpecificFromDB(string searchValue, Action<List<DataItem>> callback)
     {
         APIClass aPIClass = new APIClass();
-        string jsonData = aPIClass.SelectFromDatabase("InheemseSoort", searchValue);
+        string jsonData = aPIClass.SelectFromDatabase("InheemseSoort", "Naam", searchValue);
         StartCoroutine(aPIClass.ConnectToApi(jsonData, (response) =>
         {
             callback(response);

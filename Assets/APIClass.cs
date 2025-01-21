@@ -84,11 +84,7 @@ public class APIClass : MonoBehaviour
         // Bouw de SQL-query op basis van de invoer
         if (!string.IsNullOrEmpty(searchValue) && columnToSearch != "*")
         {
-            query = $"SELECT {columnToSearch} FROM {databaseTable} WHERE {columnToSearch} = '{searchValue}' AND Status = 'Goedgekeurd'";
-        }
-        else if (columnToSearch != "*")
-        {
-            query = $"SELECT {columnToSearch} FROM {databaseTable} WHERE Status = 'Goedgekeurd'";
+            query = $"SELECT * FROM {databaseTable} WHERE {columnToSearch} = '{searchValue}' AND Status = 'Goedgekeurd'";
         }
         else
         {
