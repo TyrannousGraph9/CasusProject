@@ -25,29 +25,10 @@ public class APIClass : MonoBehaviour
         // string jsonData = InsertIntoDatabase("InheemseSoort", inheemseSoortValues);
         // StartCoroutine(ConnectToApi(jsonData));
         
-
-        // Voorbeeld 2: Data toevoegen aan de 'Fotos'-tabel
-        
-        string gebruikerId = "1";
-
-        Dictionary<string, string> fotosValues = new Dictionary<string, string>
-        {
-            { "FotoURL", "https://example.com/images/golden_eagle.jpg" },
-            { "Beschrijving", "A stunning image of a Golden Eagle." },
-            { "Status", "In Beoordeling" }, // Default status
-            { "GebruikerID", gebruikerId }, // Use a valid GebruikerID
-            { "UploadDatum", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") } // Current date and time
-        };
-
-        string jsonData = InsertIntoDatabase("Fotos", fotosValues);
-        StartCoroutine(ConnectToApi(jsonData, (response) => {
-            Debug.Log("API Response: " + response);
-        }));
-        
     }
 
     // Methode om een SQL INSERT-query te bouwen en om te zetten naar JSON
-   public string InsertIntoDatabase(string databaseTable, Dictionary<string, string> values)
+    public string InsertIntoDatabase(string databaseTable, Dictionary<string, string> values)
     {
         string query = null; // Hier wordt de SQL-query opgeslagen
         string jsonData = null; // Hier wordt de query als JSON opgeslagen
@@ -58,21 +39,8 @@ public class APIClass : MonoBehaviour
             throw new ArgumentException("De tabelnaam en waarden moeten worden opgegeven.");
         }
 
-        if (databaseTable == "Fotos")
-        {
-            // Controleer of alle verplichte velden voor 'Fotos' aanwezig zijn
-            if (!values.ContainsKey("Foto") || !values.ContainsKey("Beschrijving") ||
-                !values.ContainsKey("Status") || !values.ContainsKey("GebruikerID"))
-            {
-                throw new ArgumentException("FotoURL, Beschrijving, Status en GebruikerID zijn verplicht voor de Fotos-tabel.");
-            }
-
-            // Bouw de SQL-query
-            string columns = string.Join(", ", values.Keys); // Kolomnamen combineren
-            string valuesList = string.Join(", ", values.Values.Select(value => $"'{value}'")); // Waarden combineren met quotes
-            query = $"INSERT INTO Fotos ({columns}) VALUES ({valuesList})";
-        }
-        else if (databaseTable == "InheemseSoort")
+        
+        if (databaseTable == "InheemseSoort")
         {
             // Controleer of alle verplichte velden voor 'InheemseSoort' aanwezig zijn
             if (!values.ContainsKey("Naam") || !values.ContainsKey("LocatieNaam") ||
@@ -116,15 +84,11 @@ public class APIClass : MonoBehaviour
         // Bouw de SQL-query op basis van de invoer
         if (!string.IsNullOrEmpty(searchValue) && columnToSearch != "*")
         {
-            query = $"SELECT {columnToSearch}, FotoURL FROM {databaseTable} JOIN Fotos ON {databaseTable}.ID = Fotos.ID WHERE {columnToSearch} = '{searchValue}'";
+            query = $"SELECT * FROM {databaseTable} WHERE {columnToSearch} = '{searchValue}' AND Status = 'Goedgekeurd'";
         }
-        else if (columnToSearch != "*")
+        else
         {
-            query = $"SELECT {columnToSearch}, FotoURL FROM {databaseTable} JOIN Fotos ON {databaseTable}.ID = Fotos.ID";
-        }
-        else if (string.IsNullOrEmpty(searchValue))
-        {
-            query = $"SELECT *, FotoURL FROM {databaseTable} JOIN Fotos ON {databaseTable}.ID = Fotos.ID WHERE Status = 'Goedgekeurd'";
+            query = $"SELECT * FROM {databaseTable} WHERE Status = 'Goedgekeurd'";
         }
 
         // Zet de query om in JSON-formaat
@@ -178,20 +142,20 @@ public class APIClass : MonoBehaviour
 
     private List<DataItem> FilterResponse(string response)
     {
-    response = response.Replace("\n", "");
+        response = response.Replace("\n", "");
 
-    ApiResponse apiResponse = JsonUtility.FromJson<ApiResponse>(response);
+        ApiResponse apiResponse = JsonUtility.FromJson<ApiResponse>(response);
 
-    if (apiResponse.success)
-    {
-        return apiResponse.data;
+        if (apiResponse.success)
+        {
+            return apiResponse.data;
+        }
+        else
+        {
+            Debug.LogError("API response indicates failure.");
+            return null;
+        }
     }
-    else
-    {
-        Debug.LogError("API response indicates failure.");
-        return null;
-    }
-}
 }
 
 // Klasse om de querydata op te slaan voor JSON-serialisatie
@@ -212,7 +176,7 @@ public class ApiResponse
 [System.Serializable]
 public class DataItem
 {   
-    public Texture2D Foto;
+    public string Foto;
     public string Naam;
     public string LocatieNaam;
     public string Longitude;
