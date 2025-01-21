@@ -7,21 +7,34 @@ public class Popup_handler : MonoBehaviour
 
     public int popupCount;
     
-
+    public GameObject popupHolderToDelete;
     void Start()
-    {
-        foreach(GameObject popup in popupHolder)
-        {
-            popup.SetActive(false);
-        }   
+    {   
+        int isTutorialChecked = PlayerPrefs.GetInt("tutorial");
         
-        popupHolder[0].SetActive(true);
-        popupCount = 0;
+        if(isTutorialChecked == 0)
+        {
+            foreach(GameObject popup in popupHolder)
+            {
+                popup.SetActive(false);
+            }   
+            
+            popupHolder[0].SetActive(true);
+            popupCount = 0;
+        }
+        else
+        {
+            foreach(GameObject popup in popupHolder)
+            {
+                popup.SetActive(false);
+            }
+        }
     }
 
     public void Deny()
     {
-        Destroy(this.gameObject);
+        Destroy(popupHolderToDelete);
+        PlayerPrefs.SetInt("tutorial", 1);
     }
 
     public void Confirm(int setActive)
