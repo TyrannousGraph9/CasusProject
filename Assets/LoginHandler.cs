@@ -1,31 +1,41 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 public class LoginHandler : MonoBehaviour
 {
    public TMP_InputField gebruikerField, wachtwoordField;
+   public Button GebruikerButton;	
 
+   public void Start()
+   {
+      GebruikerButton.onClick.AddListener(GebruikerLogin);
+   }
+   public void GebruikerLogin()
+   {
+      SceneManager.LoadScene("Gast");
+   }
    public void SubmitLogin()
    {
-      APIClass aPIClass = new APIClass();
-      
-      string response = aPIClass.DatabaseLoginHandler(gebruikerField.text, wachtwoordField.text);
-
-      switch(response)
-      {
-         case "Gebruiker":
-            Debug.Log("Gebruiker ingelogd");
-            SceneManager.LoadScene("gast");
-            break;
-         case "Admin":
-            Debug.Log("Admin ingelogd");
-            SceneManager.LoadScene("admin");
-            break;
-         default:
-            Debug.Log("Gebruiker niet gevonden");
-            // errortxt.text = "Gebruiker niet gevonden";
-            break;
-      }
+         string gebruiker = gebruikerField.text;
+         string wachtwoord = wachtwoordField.text;
+   
+         if (string.IsNullOrEmpty(gebruiker) || string.IsNullOrEmpty(wachtwoord))
+         {
+            Debug.LogError("Vul alle velden in.");
+            return;
+         }
+   
+         // Check of de gebruiker bestaat
+         if (gebruiker == "admin" && wachtwoord == "admin")
+         {
+            Debug.Log("Inloggen gelukt!");
+            SceneManager.LoadScene("Admin");
+         }
+         else
+         {
+            Debug.LogError("Inloggen mislukt.");
+         }
 
 
    }
