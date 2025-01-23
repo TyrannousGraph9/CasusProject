@@ -182,4 +182,5 @@ public class DataItem
     public string Longitude;
     public string Latitude;
     public string Datum;
+    public string Beschrijving;
 }

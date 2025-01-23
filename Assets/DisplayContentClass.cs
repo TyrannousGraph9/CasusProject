@@ -10,6 +10,11 @@ public class DisplayContentClass : MonoBehaviour
 
     public TMP_InputField searchInput;
 
+    public GameObject mainScreen;
+
+    public GameObject infoScreen;
+    public Button backButton;
+
     void OnEnable()
     {
         
@@ -70,6 +75,7 @@ public class DisplayContentClass : MonoBehaviour
 
         foreach (var item in items)
         {
+            Debug.Log(item);
             GameObject scherm = Instantiate(schermContainer);
             scherm.transform.SetParent(transform, false);
 
@@ -78,6 +84,9 @@ public class DisplayContentClass : MonoBehaviour
 
             // Set Text
             SetText(item, scherm);
+
+            // Set Button
+            SetButton(item, scherm);
         }
     }
 
@@ -91,7 +100,6 @@ public class DisplayContentClass : MonoBehaviour
             {
                 if (string.IsNullOrEmpty(item.Foto))
                 {
-                    Debug.LogWarning($"Foto field is empty or null for item: {item.Naam}");
                     return;
                 }
 
@@ -99,33 +107,30 @@ public class DisplayContentClass : MonoBehaviour
                 if (IsBase64String(item.Foto))
                 {
                     imageBytes = Convert.FromBase64String(item.Foto);
-                    Debug.Log($"Decoded image size for item '{item.Naam}': {imageBytes.Length} bytes");
                 }
                 else
                 {
-                    Debug.LogWarning($"Foto for item '{item.Naam}' is not Base64 encoded. Assuming raw binary.");
                     imageBytes = System.Text.Encoding.UTF8.GetBytes(item.Foto);
                 }
 
                 Texture2D texture = new Texture2D(2, 2);
                 if (texture.LoadImage(imageBytes))
                 {
-                    Debug.Log($"Texture created successfully for item '{item.Naam}'. Width: {texture.width}, Height: {texture.height}");
                     image.texture = texture;
                 }
                 else
                 {
-                    Debug.LogError($"Failed to create texture for item '{item.Naam}'.");
+                    return;
                 }
             }
             else
             {
-                Debug.LogError("RawImage component not found in schermContainer.");
+                return;
             }
         }
         else
         {
-            Debug.LogError("RawImage transform not found in schermContainer.");
+           return;
         }
     }
 
@@ -186,5 +191,91 @@ public class DisplayContentClass : MonoBehaviour
         {
             return false;
         }
+    }
+    private void SetButton(DataItem item, GameObject scherm)
+    {
+        Transform buttonTransform = scherm.transform.Find("Info_icon");
+        if (buttonTransform != null)
+        {
+            Button button = buttonTransform.GetComponent<Button>();
+            if (button != null)
+            {
+                button.onClick.AddListener(() => OnButtonClick(item));
+            }
+        }
+    }
+
+    private void OnButtonClick(DataItem item)
+    {
+        // Hide the current screen and show the info screen
+        mainScreen.gameObject.SetActive(false);
+        infoScreen.SetActive(true);
+
+        // Display the specific data for the item in the info screen
+        Transform naamTransform = infoScreen.transform.Find("Naam_text");
+        if (naamTransform != null)
+        {
+            TMP_Text naamText = naamTransform.GetComponent<TMP_Text>();
+            if (naamText != null)
+            {
+            naamText.text = item.Naam;
+            }
+        }
+
+        Transform beschrijvingTransform = infoScreen.transform.Find("Beschrijving_text");
+        if (beschrijvingTransform != null)
+        {
+            TMP_Text beschrijvingText = beschrijvingTransform.GetComponent<TMP_Text>();
+            if (beschrijvingText != null)
+            {
+            beschrijvingText.text = item.Beschrijving;
+            }
+        }
+
+        Transform locatieTransform = infoScreen.transform.Find("Locatie_text");
+        if (locatieTransform != null)
+        {
+            TMP_Text locatieText = locatieTransform.GetComponent<TMP_Text>();
+            if (locatieText != null)
+            {
+            locatieText.text = item.LocatieNaam;
+            }
+        }
+        RawImage image = infoScreen.transform.Find("Inheemsesoort_foto").GetComponent<RawImage>();
+        if (image != null)
+        {
+            if(item.Foto != null)
+            {
+                byte[] imageBytes;
+                
+                if (IsBase64String(item.Foto))
+                {
+                    imageBytes = Convert.FromBase64String(item.Foto);
+                }
+                else
+                {
+                    imageBytes = System.Text.Encoding.UTF8.GetBytes(item.Foto);
+                }
+                Texture2D texture = new Texture2D(2, 2);
+                if (texture.LoadImage(imageBytes))
+                {
+                    image.texture = texture;
+                }
+                else
+                {
+                    image.texture = Resources.Load<Texture2D>("Images/Template_Foto");
+                }
+            }
+        }
+        // Set up the back button to switch back to the current screen
+        backButton.onClick.RemoveAllListeners();
+        backButton.onClick.AddListener(() => OnBackButtonClick());
+    }
+
+    private void OnBackButtonClick()
+    {
+        // Hide the info screen and show the current screen
+        infoScreen.SetActive(false);
+        mainScreen.gameObject.SetActive(true);
     }
 }
