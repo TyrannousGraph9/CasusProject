@@ -9924,7 +9924,7 @@ GameObject:
   - component: {fileID: 1818214667}
   - component: {fileID: 1818214666}
   m_Layer: 5
-  m_Name: Locatie_Text
+  m_Name: Locatie_text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
