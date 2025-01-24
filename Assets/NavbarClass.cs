@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class NavbarClass : MonoBehaviour
 {
-    public GameObject cameraPanel, infoPanel;
+    public GameObject cameraPanel, infoPanel, landingScherm;
     
     public void SwitchScreen(string activeScreen)
     {
@@ -11,11 +11,13 @@ public class NavbarClass : MonoBehaviour
             case "camera":
                 cameraPanel.SetActive(true);
                 infoPanel.SetActive(false);
+                landingScherm.SetActive(false);
                 break;
 
             case "info":
                 infoPanel.SetActive(true);      
                 cameraPanel.SetActive(false);
+                landingScherm.SetActive(false);
                 break;
         }
     }
