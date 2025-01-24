@@ -29,6 +29,7 @@ public class LoginHandler : MonoBehaviour
          // Check of de gebruiker bestaat
          if (gebruiker == "admin" && wachtwoord == "admin")
          {
+            PlayerPrefs.SetInt("IsAdmin", 1);
             Debug.Log("Inloggen gelukt!");
             SceneManager.LoadScene("Admin");
          }

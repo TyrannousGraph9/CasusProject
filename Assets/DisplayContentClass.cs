@@ -270,6 +270,97 @@ public class DisplayContentClass : MonoBehaviour
         // Set up the back button to switch back to the current screen
         backButton.onClick.RemoveAllListeners();
         backButton.onClick.AddListener(() => OnBackButtonClick());
+
+        if(PlayerPrefs.GetInt("IsAdmin") == 1)
+        {
+            Transform keurGoedButtonTransform = infoScreen.transform.Find("Goedkeur_icon");
+            if (keurGoedButtonTransform != null)
+            {
+                Button keurGoedButton = keurGoedButtonTransform.GetComponent<Button>();
+                if (keurGoedButton != null)
+                {
+                    keurGoedButton.onClick.RemoveAllListeners();
+                    keurGoedButton.onClick.AddListener(() => KeurGoed(item.Naam));
+                }
+            }
+
+            Transform keurAfButtonTransform = infoScreen.transform.Find("Afkeur_icon");
+            if (keurAfButtonTransform != null)
+            {
+                Button keurAfButton = keurAfButtonTransform.GetComponent<Button>();
+                if (keurAfButton != null)
+                {
+                    keurAfButton.onClick.RemoveAllListeners();
+                    keurAfButton.onClick.AddListener(() => KeurAf(item.Naam));
+                }
+            }
+
+            Transform verwijderButtonTransform = infoScreen.transform.Find("Verwijder_icon");
+            if (verwijderButtonTransform != null)
+            {
+                Button verwijderButton = verwijderButtonTransform.GetComponent<Button>();
+                if (verwijderButton != null)
+                {
+                    verwijderButton.onClick.RemoveAllListeners();
+                    verwijderButton.onClick.AddListener(() => Verwijder(item.Naam));
+                }
+            }
+        }
+        
+    }
+
+    public void KeurGoed(string naamId)
+    {
+        OnBackButtonClick();
+        APIClass aPIClass = new APIClass();
+        string jsonData = aPIClass.KeurGoedDatabase("InheemseSoort", "Status", "Naam",naamId);
+        StartCoroutine(aPIClass.ConnectToAdminApi(jsonData, (response) =>
+        {
+            if (response != null)
+            {
+                Debug.Log("Item is goedgekeurd.");
+            }
+            else
+            {
+                Debug.LogError("Failed to update the database.");
+            }
+        }));
+    }
+
+    public void KeurAf(string naamId)
+    {
+        OnBackButtonClick();
+        APIClass aPIClass = new APIClass();
+        string jsonData = aPIClass.KeurAfDatabase("InheemseSoort", "Status", "Naam",naamId);
+        StartCoroutine(aPIClass.ConnectToAdminApi(jsonData, (response) =>
+        {
+            if (response != null)
+            {
+                Debug.Log("Item is afgekeurd.");
+            }
+            else
+            {
+                Debug.LogError("Failed to update the database.");
+            }
+        }));
+    }
+
+    public void Verwijder(string naamId)
+    {
+        OnBackButtonClick();
+        APIClass aPIClass = new APIClass();
+        string jsonData = aPIClass.VerwijderRecord("InheemseSoort", "Naam", naamId);
+        StartCoroutine(aPIClass.ConnectToAdminApi(jsonData, (response) =>
+        {
+            if (response != null)
+            {
+                Debug.Log("Item is verwijderd.");
+            }
+            else
+            {
+                Debug.LogError("Failed to update the database.");
+            }
+        }));
     }
 
     private void OnBackButtonClick()
@@ -278,4 +369,6 @@ public class DisplayContentClass : MonoBehaviour
         infoScreen.SetActive(false);
         mainScreen.gameObject.SetActive(true);
     }
+
+    
 }

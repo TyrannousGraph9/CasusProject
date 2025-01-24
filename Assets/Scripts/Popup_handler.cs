@@ -7,34 +7,21 @@ public class Popup_handler : MonoBehaviour
 
     public int popupCount;
     
-    public GameObject popupHolderToDelete;
+
     void Start()
-    {   
-        int isTutorialChecked = PlayerPrefs.GetInt("tutorial");
+    {
+        foreach(GameObject popup in popupHolder)
+        {
+            popup.SetActive(false);
+        }   
         
-        if(isTutorialChecked == 0)
-        {
-            foreach(GameObject popup in popupHolder)
-            {
-                popup.SetActive(false);
-            }   
-            
-            popupHolder[0].SetActive(true);
-            popupCount = 0;
-        }
-        else
-        {
-            foreach(GameObject popup in popupHolder)
-            {
-                popup.SetActive(false);
-            }
-        }
+        popupHolder[0].SetActive(true);
+        popupCount = 0;
     }
 
     public void Deny()
     {
-        Destroy(popupHolderToDelete);
-        PlayerPrefs.SetInt("tutorial", 1);
+        Destroy(this.gameObject);
     }
 
     public void Confirm(int setActive)
@@ -58,14 +45,19 @@ public class Popup_handler : MonoBehaviour
 
    public string ChangeText(int popupCount)
    {
-    if Gebruiker == "admin":
-        TutorialTextsAdmin tutorialTexts = new TutorialTextsAdmin();
-        string popupText = tutorialTexts.GetText(popupCount);
-    else:   
-        TutorialTexts tutorialTexts = new TutorialTexts();
-        string popupText = tutorialTexts.GetText(popupCount);
-        
-        return popupText;
+        int isAdmin = PlayerPrefs.GetInt("IsAdmin");
+        if (isAdmin == 1)
+        {
+            TutorialTextsAdmin tutorialTexts = new TutorialTextsAdmin();
+            string popupText = tutorialTexts.GetText(popupCount);
+            return popupText;
+        }
+        else
+        {
+            TutorialTexts tutorialTexts = new TutorialTexts();
+            string popupText = tutorialTexts.GetText(popupCount);
+            return popupText;
+        }
    }
         
 }
