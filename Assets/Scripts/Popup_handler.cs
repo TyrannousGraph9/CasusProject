@@ -58,6 +58,10 @@ public class Popup_handler : MonoBehaviour
 
    public string ChangeText(int popupCount)
    {
+    if Gebruiker == "admin":
+        TutorialTextsAdmin tutorialTexts = new TutorialTextsAdmin();
+        string popupText = tutorialTexts.GetText(popupCount);
+    else:   
         TutorialTexts tutorialTexts = new TutorialTexts();
         string popupText = tutorialTexts.GetText(popupCount);
         
