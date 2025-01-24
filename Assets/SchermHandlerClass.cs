@@ -17,6 +17,7 @@ public class SchermHandlerClass : MonoBehaviour
         schermen[huidigScherm].SetActive(true);
     }
 
+    [System.Obsolete]
     public void VorigScherm()
     {
         schermen[huidigScherm].SetActive(false);
@@ -29,6 +30,7 @@ public class SchermHandlerClass : MonoBehaviour
         DataPerStap(huidigScherm);
     }
 
+    [System.Obsolete]
     public void VolgendScherm()
     {
         schermen[huidigScherm].SetActive(false);
@@ -40,7 +42,8 @@ public class SchermHandlerClass : MonoBehaviour
         schermen[huidigScherm].SetActive(true);
         DataPerStap(huidigScherm);
     }
-    
+
+    [System.Obsolete]
     public void DataPerStap(int stap)
     {
         switch (huidigScherm)
