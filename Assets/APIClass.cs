@@ -8,6 +8,7 @@ public class APIClass : MonoBehaviour
 {
     // De API-endpoint voor de databaseverbinding
     private string connectionString = "http://98.71.252.54/apinederland.php";
+    private string connectionStringAdmin = "http://98.71.252.54/apinederlandadmin.php";
 
     void Start()
     {
@@ -82,13 +83,29 @@ public class APIClass : MonoBehaviour
         }
 
         // Bouw de SQL-query op basis van de invoer
-        if (!string.IsNullOrEmpty(searchValue) && columnToSearch != "*")
+        if (PlayerPrefs.GetInt("IsAdmin") == 1)
         {
-            query = $"SELECT * FROM {databaseTable} WHERE {columnToSearch} = '{searchValue}' AND Status = 'Goedgekeurd'";
+            // Admin: Select all records without filtering by status
+            if (!string.IsNullOrEmpty(searchValue) && columnToSearch != "*")
+            {
+                query = $"SELECT * FROM {databaseTable} WHERE {columnToSearch} = '{searchValue}'";
+            }
+            else
+            {
+                query = $"SELECT * FROM {databaseTable}";
+            }
         }
         else
         {
-            query = $"SELECT * FROM {databaseTable} WHERE Status = 'Goedgekeurd'";
+            // Non-admin: Select records with status 'Goedgekeurd'
+            if (!string.IsNullOrEmpty(searchValue) && columnToSearch != "*")
+            {
+                query = $"SELECT * FROM {databaseTable} WHERE {columnToSearch} = '{searchValue}' AND Status = 'Goedgekeurd'";
+            }
+            else
+            {
+                query = $"SELECT * FROM {databaseTable} WHERE Status = 'Goedgekeurd'";
+            }
         }
 
         // Zet de query om in JSON-formaat
@@ -99,6 +116,78 @@ public class APIClass : MonoBehaviour
 
         return jsonData;
     }
+
+        public string KeurGoedDatabase(string databaseTable, string columnToUpdate, string identifierColumn, string identifierValue)
+    {
+        string query = null; // Hier wordt de SQL-query opgeslagen
+        string jsonData = null; // Hier wordt de query als JSON opgeslagen
+
+        // Controleren of de invoer geldig is
+        if (string.IsNullOrEmpty(databaseTable) || string.IsNullOrEmpty(columnToUpdate) || 
+            string.IsNullOrEmpty(identifierColumn) || string.IsNullOrEmpty(identifierValue))
+        {
+            throw new ArgumentException("Alle parameters moeten worden opgegeven.");
+        }
+
+        // Bouw de SQL-query om de status te wijzigen naar 'Goedgekeurd'
+        query = $"UPDATE {databaseTable} SET {columnToUpdate} = 'Goedgekeurd' WHERE {identifierColumn} = '{identifierValue}'";
+
+        // Zet de query om in JSON-formaat
+        if (!string.IsNullOrEmpty(query))
+        {
+            jsonData = JsonUtility.ToJson(new QueryData { query = query });
+        }
+
+        return jsonData;
+    }
+
+    public string KeurAfDatabase(string databaseTable, string columnToUpdate, string identifierColumn, string identifierValue)
+    {
+        string query = null; // Hier wordt de SQL-query opgeslagen
+        string jsonData = null; // Hier wordt de query als JSON opgeslagen
+
+        // Controleren of de invoer geldig is
+        if (string.IsNullOrEmpty(databaseTable) || string.IsNullOrEmpty(columnToUpdate) || 
+            string.IsNullOrEmpty(identifierColumn) || string.IsNullOrEmpty(identifierValue))
+        {
+            throw new ArgumentException("Alle parameters moeten worden opgegeven.");
+        }
+
+        // Bouw de SQL-query om de status te wijzigen naar 'Afgekeurd'
+        query = $"UPDATE {databaseTable} SET {columnToUpdate} = 'Afgekeurd' WHERE {identifierColumn} = '{identifierValue}'";
+
+        // Zet de query om in JSON-formaat
+        if (!string.IsNullOrEmpty(query))
+        {
+            jsonData = JsonUtility.ToJson(new QueryData { query = query });
+        }
+
+        return jsonData;
+    }
+
+    public string VerwijderRecord(string databaseTable, string identifierColumn, string identifierValue)
+    {
+        string query = null; // Hier wordt de SQL-query opgeslagen
+        string jsonData = null; // Hier wordt de query als JSON opgeslagen
+
+        // Controleren of de invoer geldig is
+        if (string.IsNullOrEmpty(databaseTable) || string.IsNullOrEmpty(identifierColumn) || string.IsNullOrEmpty(identifierValue))
+        {
+            throw new ArgumentException("Alle parameters moeten worden opgegeven.");
+        }
+
+        // Bouw de SQL-query om een record te verwijderen
+        query = $"DELETE FROM {databaseTable} WHERE {identifierColumn} = '{identifierValue}'";
+
+        // Zet de query om in JSON-formaat
+        if (!string.IsNullOrEmpty(query))
+        {
+            jsonData = JsonUtility.ToJson(new QueryData { query = query });
+        }
+
+        return jsonData;
+    }
+
 
 //    public string DatabaseLoginHandler(string gebruikersnaam, string wachtwoord)
 //   {
@@ -139,6 +228,36 @@ public class APIClass : MonoBehaviour
             callback(filteredData);
         }
     }
+
+    public IEnumerator ConnectToAdminApi(string jsonData, Action<List<DataItem>> callback)
+    {
+        // Instellen van de UnityWebRequest voor een POST-aanvraag
+        UnityWebRequest request = new UnityWebRequest(connectionStringAdmin, "POST");
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData); // Converteer JSON-data naar bytes
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw); // Voeg de data toe
+        request.downloadHandler = new DownloadHandlerBuffer(); // Ontvang de reactie
+        request.SetRequestHeader("Content-Type", "application/json"); // Stel de content type in
+        request.SetRequestHeader("X-API-Key", "veiligekey123"); // Voeg een beveiligingssleutel toe
+
+        // Wacht op de reactie van de API
+        yield return request.SendWebRequest();
+
+        // Verwerk de reactie
+        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+        {
+            Debug.LogError("Fout: " + request.error);
+            Debug.LogError("Reactiecode: " + request.responseCode);
+            Debug.LogError("Reactie: " + request.downloadHandler.text);
+            callback(null);
+        }
+        else
+        {
+            Debug.Log("Reactie: " + request.downloadHandler.text);
+            List<DataItem> filteredData = FilterResponse(request.downloadHandler.text);
+            callback(filteredData);
+        }
+    }
+
 
     private List<DataItem> FilterResponse(string response)
     {
