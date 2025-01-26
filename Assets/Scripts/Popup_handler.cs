@@ -7,7 +7,7 @@ public class Popup_handler : MonoBehaviour
 
     public int popupCount;
     
-
+    public GameObject mainScreen;
     void Start()
     {
         foreach(GameObject popup in popupHolder)
@@ -21,7 +21,7 @@ public class Popup_handler : MonoBehaviour
 
     public void Deny()
     {
-        Destroy(this.gameObject);
+        Destroy(mainScreen);
     }
 
     public void Confirm(int setActive)
