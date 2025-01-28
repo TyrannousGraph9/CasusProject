@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 public class GetUserLocation : MonoBehaviour
 {
     public RawImage mapImage;
+
     private string mapUrl = "https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s-l+000({0},{1})/{0},{1},14,0/600x300?access_token=pk.eyJ1IjoibmllbHNjcmVtZXJzIiwiYSI6ImNtNHJsdjNxZzA2cWoya3BkcXp0M2l3N3EifQ.7g4Ms4TNd9ZJPD0EcDM_yw";
     
     void OnEnable()

@@ -10,18 +10,28 @@ public class Popup_handler : MonoBehaviour
     public GameObject mainScreen;
     void Start()
     {
-        foreach(GameObject popup in popupHolder)
+
+        if(PlayerPrefs.GetInt("Tutorial") == 0)
         {
-            popup.SetActive(false);
-        }   
-        
-        popupHolder[0].SetActive(true);
-        popupCount = 0;
+            foreach(GameObject popup in popupHolder)
+            {
+                popup.SetActive(false);
+            }   
+                
+            popupHolder[0].SetActive(true);
+            popupCount = 0;
+            PlayerPrefs.SetInt("Tutorial", 1);
+        }
+        else
+        {
+            mainScreen.SetActive(false);
+        }
     }
 
     public void Deny()
     {
         Destroy(mainScreen);
+        PlayerPrefs.SetInt("Tutorial", 1);
     }
 
     public void Confirm(int setActive)

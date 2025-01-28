@@ -120,7 +120,7 @@ public class DisplayContentClass : MonoBehaviour
                 }
                 else
                 {
-                    return;
+                    image.texture = Resources.Load<Texture2D>("Images/Template_Foto");
                 }
             }
             else
@@ -218,7 +218,7 @@ public class DisplayContentClass : MonoBehaviour
             TMP_Text naamText = naamTransform.GetComponent<TMP_Text>();
             if (naamText != null)
             {
-            naamText.text = item.Naam;
+            naamText.text =  "Naam: " + item.Naam;
             }
         }
 
@@ -228,7 +228,7 @@ public class DisplayContentClass : MonoBehaviour
             TMP_Text beschrijvingText = beschrijvingTransform.GetComponent<TMP_Text>();
             if (beschrijvingText != null)
             {
-            beschrijvingText.text = item.Beschrijving;
+            beschrijvingText.text = "Beschrijving: " + item.Beschrijving;
             }
         }
 
@@ -238,7 +238,7 @@ public class DisplayContentClass : MonoBehaviour
             TMP_Text locatieText = locatieTransform.GetComponent<TMP_Text>();
             if (locatieText != null)
             {
-            locatieText.text = item.LocatieNaam;
+            locatieText.text = "Locatie: " + item.LocatieNaam;
             }
         }
         RawImage image = infoScreen.transform.Find("Inheemsesoort_foto").GetComponent<RawImage>();

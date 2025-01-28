@@ -5,10 +5,13 @@ using UnityEngine.UI;
 public class LoginHandler : MonoBehaviour
 {
    public TMP_InputField gebruikerField, wachtwoordField;
+
+   public TextMeshProUGUI errorText;
    public Button GebruikerButton;	
 
    public void Start()
    {
+      PlayerPrefs.SetInt("IsAdmin", 0);
       GebruikerButton.onClick.AddListener(GebruikerLogin);
    }
    public void GebruikerLogin()
@@ -22,22 +25,19 @@ public class LoginHandler : MonoBehaviour
    
          if (string.IsNullOrEmpty(gebruiker) || string.IsNullOrEmpty(wachtwoord))
          {
-            Debug.LogError("Vul alle velden in.");
+            errorText.text = "Vul alle velden in!";
             return;
          }
    
          // Check of de gebruiker bestaat
-         if (gebruiker == "admin" && wachtwoord == "admin")
+         if (gebruiker == "admin" && wachtwoord == "Z4yDH0G3Sch00l!@###")
          {
             PlayerPrefs.SetInt("IsAdmin", 1);
-            Debug.Log("Inloggen gelukt!");
             SceneManager.LoadScene("Admin");
          }
          else
          {
-            Debug.LogError("Inloggen mislukt.");
+            errorText.text = "Je hebt de foute inloggegevens ingevoerd!";
          }
-
-
    }
 }

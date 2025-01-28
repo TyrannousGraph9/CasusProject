@@ -19,7 +19,13 @@ public class NavbarClass : MonoBehaviour
                 cameraPanel.SetActive(false);
                 landingScherm.SetActive(false);
                 break;
+            case "home":
+                landingScherm.SetActive(true);
+                cameraPanel.SetActive(false);
+                infoPanel.SetActive(false);
+                break;
         }
+
     }
 
 
@@ -32,5 +38,10 @@ public class NavbarClass : MonoBehaviour
     public void OpenCamera()
     {
         SwitchScreen("camera");
+    }
+
+    public void OpenHome()
+    {
+        SwitchScreen("home");
     }
 }
