@@ -13,7 +13,7 @@ public class APIClass : MonoBehaviour
     void Start()
     {
         // Voorbeeld 1: Data toevoegen aan de 'InheemseSoort'-tabel
-        
+
         // Dictionary<string, string> inheemseSoortValues = new Dictionary<string, string>
         // {
         //     { "Naam", "Hond" },
@@ -25,7 +25,7 @@ public class APIClass : MonoBehaviour
 
         // string jsonData = InsertIntoDatabase("InheemseSoort", inheemseSoortValues);
         // StartCoroutine(ConnectToApi(jsonData));
-        
+
     }
 
     // Methode om een SQL INSERT-query te bouwen en om te zetten naar JSON
@@ -40,7 +40,7 @@ public class APIClass : MonoBehaviour
             throw new ArgumentException("De tabelnaam en waarden moeten worden opgegeven.");
         }
 
-        
+
         if (databaseTable == "InheemseSoort")
         {
             // Controleer of alle verplichte velden voor 'InheemseSoort' aanwezig zijn
@@ -82,7 +82,6 @@ public class APIClass : MonoBehaviour
             throw new ArgumentException("De tabelnaam moet worden opgegeven.");
         }
 
-        // Bouw de SQL-query op basis van de invoer
         if (PlayerPrefs.GetInt("IsAdmin") == 1)
         {
             // Admin: Select all records without filtering by status
@@ -92,12 +91,12 @@ public class APIClass : MonoBehaviour
             }
             else
             {
-                query = $"SELECT * FROM {databaseTable}";
+                query = $"SELECT * FROM {databaseTable} WHERE Status = 'In Beoordeling' OR Status = 'Afgekeurd'";
             }
         }
         else
         {
-            // Non-admin: Select records with status 'Goedgekeurd'
+            // Non-admin: Select only records where status is 'Goedgekeurd'
             if (!string.IsNullOrEmpty(searchValue) && columnToSearch != "*")
             {
                 query = $"SELECT * FROM {databaseTable} WHERE {columnToSearch} = '{searchValue}' AND Status = 'Goedgekeurd'";
@@ -169,24 +168,21 @@ public class APIClass : MonoBehaviour
     {
         string query = null; // Hier wordt de SQL-query opgeslagen
         string jsonData = null; // Hier wordt de query als JSON opgeslagen
-
         // Controleren of de invoer geldig is
         if (string.IsNullOrEmpty(databaseTable) || string.IsNullOrEmpty(identifierColumn) || string.IsNullOrEmpty(identifierValue))
         {
             throw new ArgumentException("Alle parameters moeten worden opgegeven.");
         }
-
         // Bouw de SQL-query om een record te verwijderen
         query = $"DELETE FROM {databaseTable} WHERE {identifierColumn} = '{identifierValue}'";
-
         // Zet de query om in JSON-formaat
         if (!string.IsNullOrEmpty(query))
         {
             jsonData = JsonUtility.ToJson(new QueryData { query = query });
         }
-
         return jsonData;
     }
+
 
 
 //    public string DatabaseLoginHandler(string gebruikersnaam, string wachtwoord)
